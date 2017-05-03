@@ -1,0 +1,1 @@
+@cd %USERPROFILE%\Documents\DOS

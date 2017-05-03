@@ -1,0 +1,1 @@
+doskey uplspoimp=uploadSpoImport.bat

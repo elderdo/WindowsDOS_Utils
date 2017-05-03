@@ -1,0 +1,10 @@
+%ORACLE_HOME%\bin\tnsping PGA9
+%ORACLE_HOME%\bin\tnsping PGA9
+%ORACLE_HOME%\bin\tnsping PGA9
+%ORACLE_HOME%\bin\tnsping PSMSD
+%ORACLE_HOME%\bin\tnsping U50DAMC
+%ORACLE_HOME%\bin\tnsping CIMD
+%ORACLE_HOME%\bin\tnsping U40DAMC
+%ORACLE_HOME%\bin\tnsping PSMSD
+%ORACLE_HOME%\bin\tnsping dgoldlb
+%ORACLE_HOME%\bin\tnsping BSSMI

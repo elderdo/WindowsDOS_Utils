@@ -1,0 +1,15 @@
+%ORACLE_HOME%\bin\tnsping CIMD
+%ORACLE_HOME%\bin\tnsping FLIPD
+%ORACLE_HOME%\bin\tnsping PGA9
+%ORACLE_HOME%\bin\tnsping PSLMSD
+%ORACLE_HOME%\bin\tnsping PSMSD
+%ORACLE_HOME%\bin\tnsping STL_DESCM
+%ORACLE_HOME%\bin\tnsping U40DAMC
+%ORACLE_HOME%\bin\tnsping U50DAMC
+%ORACLE_HOME%\bin\tnsping dgoldlb
+%ORACLE_HOME%\bin\tnsping pgoldlb
+%ORACLE_HOME%\bin\tnsping pgoldsa
+%ORACLE_HOME%\bin\tnsping psmsprod
+%ORACLE_HOME%\bin\tnsping psmv
+%ORACLE_HOME%\bin\tnsping psmvp
+%ORACLE_HOME%\bin\tnsping sgoldlb
