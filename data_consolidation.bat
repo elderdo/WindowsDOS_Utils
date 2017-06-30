@@ -1,18 +1,12 @@
-:: msaccess_ora32.bat
+:: data_consolidation.bat
 :: Author: Douglas S. Elder
-:: Date: 9/14/2012
-::
-:: 10/17/2012 added parameter for file name
-::
-:: 5/2/2017   Changed method of finding Oracle's home
-:: directory. The script now assumes that Software Express
-:: has installed the Oracle client software under C:\Oracle
+:: Date: 5/2/2017
 ::
 :: Desc: This script makes sure 32 bit Oracle is found first
 :: via the PATH variable
 :: It also sets up the ORACLE_HOME and TNS_ADMIN environment variables
 :: for the 32 bit directory
-:: It runs msaccess in this environment
+:: It runs msaccess in this environment for the data_consolidation.accdb
 @echo off
 
 setlocal
@@ -35,7 +29,10 @@ IF NOT EXIST %ORAHOME_SHORT_NAME%\bin\NUL GOTO noOraBinDIR
 set TNS_ADMIN=%ORAHOME_SHORT_NAME%\network\admin
 IF NOT EXIST %TNS_ADMIN%\NUL GOTO noOraTnsDIR
 
-START %MSACCESS_SHORT_NAME% %1
+IF "%1"=="" SET DB=%CD%\Data_Consolidation.accdb
+IF NOT "%1"=="" SET DB=%1
+
+START %MSACCESS_SHORT_NAME% %DB%
 goto:eof
 
 :noOraHomeDir
