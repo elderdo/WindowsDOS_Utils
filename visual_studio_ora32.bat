@@ -13,6 +13,7 @@
 :: any linked table
 :: 9/14/2012 Rev 1.0  D. Elder initial rev
 :: 4/6/2015 Rev 1.1  D. Elder fixed filename comment at top 
+:: 6/30/2017 Rev 1.2  D. Elder changed to Visual Studio 2015
 @echo off
 
 setlocal
@@ -28,7 +29,7 @@ set PATH=%ORAHOME_SHORT_NAME%\bin;%PATH%
 IF NOT EXIST %ORAHOME_SHORT_NAME%\bin\NUL GOTO noOraBinDIR
 set TNS_ADMIN=%ORAHOME_SHORT_NAME%\network\admin
 IF NOT EXIST %TNS_ADMIN%\NUL GOTO noOraTnsDIR
-set EXE="C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe"
+set EXE="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe"
 
 if not EXIST %EXE%  goto noExe
 %EXE%
