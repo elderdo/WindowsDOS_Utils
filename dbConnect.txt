@@ -1,0 +1,34 @@
+; dbConnect.txt
+; Author: Douglas S. Elder
+; Date: 10/16/2014
+; Desc: Provide Env variables
+; for your SQL*Plus or 
+; SQL*Loader script
+; NOTE the ; starts a comment and is ignored by the bat script
+; You can create a set of these files for each env
+; like RMADD.txt, RMADI.txt, and RMADP.txt where each
+; contains the information to connect and execute the
+; SQL*Plus script or SQL*Loader script
+;
+; UID=RMADADMN_USER
+; HOST_NAME=tnsname
+; PWD=password_for_RMADADMN_USER
+; CTL_FILE=control_file_for_sqlldr
+; SCRIPT=script_for_sqlplus
+;
+; Provie the directory
+; containing the script to 
+; execute - the default is the 
+; directory where execSqlplus.bat
+; is located.
+; formnat:
+; ORACLE_PATH=directory_path
+; for example: ORACLE_PATH=C:\Users\zf297a\Documents\sql
+; 
+; change the following to valid values
+; Only put PWD= when this file is on your PC and
+; in your Documents folder
+
+UID=an_ORACLE_ID
+HOST_STRING=a_TNSNAME
+PWD=password_for_an_ORACLE_ID

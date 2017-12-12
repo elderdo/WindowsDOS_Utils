@@ -9,11 +9,14 @@
 :: specifying what opt file to use
 :: Rev 1.0 11/10/2014
 :: Rev 1.1 add slash between HOST_STRING and PWD env variables
+:: Rev 1.2 Made ORACLE_HOME the same as the one used by
+::         exeSqlplus.bat
 
 setlocal enableextensions enabledelayedexpansion
 
-set ORACLE_HOME=C:\Oracle\12cR1client64bit
+set ORACLE_HOME=C:\Oracle\11gR202Client64bit
 set PWD=
+set CTL_FILE=
 if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr
 
 set BIN=%ORACLE_HOME%\bin
@@ -34,17 +37,17 @@ set OPT_FILE=dbConnect.txt
 if "%1"=="-o" goto setOptFile
 if "%1"=="-p" goto setPasswd
 if "%1"=="-d" goto setDebug
+if "%1"=="-c" goto setCtl
 
-:: a command line argument
-if EXIST %OPT_FILE% (
+if EXIST "%OPT_FILE%" (
 for /f "eol=;" %%A in (%OPT_FILE%) do (
 	  set %%A
   )
 )
 
-
-if not EXIST %CTL_FILE% goto badCtl
-if not EXIST %DATA_FILE% goto badData
+if "%CTL_FILE%"=="" goto MissingCtl
+if not EXIST "%CTL_FILE%" goto badCtl
+if not EXIST "%DATA_FILE%" goto badData
 
 set RC=
 %BIN%\sqlldr %UID%@%HOST_STRING%/%PWD% control=%CTL_FILE% data=%DATA_FILE% ^
@@ -78,30 +81,51 @@ set OPT_FILE=%1
 shift
 goto loop
 
+:setCtl
+shift
+if "%1"=="" goto Usage
+set CTL_FILE=%1
+shift
+goto loop
+
 :badData
+@echo.
 @echo %DATA_FILE% does not exist
 goto:done
 
 :badCtl
+@echo.
 @echo %CTL_FILE% does not exist
 goto:done
 
 :oraHomeErr
+@echo.
 @echo.Cannot find directory %ORACLE_HOME%
 goto:done
 
 :oraBinErr
+@echo.
 @echo.Cannot find directory %BIN%
 goto:done
 
+:MissingCtl
+@echo.
+@echo."You must supply a ctl file for SQL*Loader to run"
+goto:Usage
+
 :oraTnsErr
+@echo.
 @echo.Cannot find directory %TNS_ADMIN%
 goto:done
 
 :Usage
-@echo "execSqlldr.bat [ -o opt_file -p pwd ]
-@echo "where opt_file contains CTL_FILE"
-@echo "where pwd is the Oracle password for %UID%"
+@echo.
+@echo."execSqlldr.bat [ -c ctl_file -d -o opt_file -p pwd ]
+@echo."where -c ctl_file is the control file for SQL*Loader to run"
+@echo."      -d turns on debug"
+@echo."      -o opt_file contains env overrides"
+@echo."      -p pwd is the Oracle password for the account being ussed"
+
 
 endlocal
 

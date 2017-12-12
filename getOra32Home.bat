@@ -15,7 +15,7 @@ set ORACLE_DIR=C:\Oracle
 if not exist %ORACLE_DIR%\Nul goto noOracleDir
 :continue
 
-for /f "delims=" %%A in ('dir /b /d %ORACLE_DIR%\*%BIT%*') do if not "%%A"=="" set ORACLE_HOME=%ORACLE_DIR%\%%A
+for /f "delims=" %%A in ('dir /b /d %ORACLE_DIR%\11gR202*%BIT%*') do if not "%%A"=="" set ORACLE_HOME=%ORACLE_DIR%\%%A
 
 if not defined ORACLE_HOME goto done
 set TNS_ADMIN=%ORACLE_HOME%\network\admin
@@ -27,8 +27,7 @@ set PATH=%BIN%;%PATH%
 @echo.ORACLE_HOME=%ORACLE_HOME%
 @echo.TNS_ADMIN=%TNS_ADMIN%
 @echo.BIN=%BIN%
-@echo.PATH=%PATH%
-goto done
+goto:eof
 
 :noOracleDir
 set SCRIPT=%TEMP%\~input.vbs
@@ -46,6 +45,6 @@ if not exist %ORACLE_DIR% goto done
 goto continue
 
 :done
-@echo ORACLE_HOME=%ORACLE_HOME%
-@echo TNS_ADMIN=%ORACLE_HOME%
-@echo %ORACLE_HOME%\bin prefixed to PATH environment variable
+@echo.ORACLE_HOME=%ORACLE_HOME%
+@echo.TNS_ADMIN=%ORACLE_HOME%
+@echo.BIN=%BIN%
