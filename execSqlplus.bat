@@ -13,6 +13,7 @@
 ::                    used OPT_FILE for env var override file
 ::                    used UID, HOST_STRING, PWD and SCRIPT
 ::                    env var's to run sqlplus
+:: Rev 1.2 04/09/2818 Changed ORACLE_HOME to C:\Oracle\11gRclient64
 
 setlocal enableextensions enabledelayedexpansion
 
@@ -25,7 +26,7 @@ set PWD=
 set UID=
 set SCRIPT=
 
-set ORACLE_HOME=c:\Oracle\11gR202Client64bit
+set ORACLE_HOME=c:\Oracle\11gRclient64
 if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr
 set BIN=c:\Oracle\11gR202Client64bit\bin
 if not EXIST %BIN%\NUL goto oraBinErr

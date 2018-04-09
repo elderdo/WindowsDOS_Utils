@@ -14,7 +14,7 @@
 
 setlocal enableextensions enabledelayedexpansion
 
-set ORACLE_HOME=C:\Oracle\11gR202Client64bit
+set ORACLE_HOME=C:\Oracle\11gR2client64
 set PWD=
 set CTL_FILE=
 if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr
