@@ -1,4 +1,5 @@
 .gitignore
+phoneinfo.bat
 afiedt.buf
 *.exe
 .*.swp
