@@ -13,7 +13,8 @@
 ::                    used OPT_FILE for env var override file
 ::                    used UID, HOST_STRING, PWD and SCRIPT
 ::                    env var's to run sqlplus
-:: Rev 1.2 04/09/2818 Changed ORACLE_HOME to C:\Oracle\11gRclient64
+:: Rev 1.2 04/09/2018 Changed ORACLE_HOME to C:\Oracle\11gRclient64
+:: Rev 1.3 10/08/2019 Automatically find a 64 bit ORACLE_HOME directory
 
 setlocal enableextensions enabledelayedexpansion
 
@@ -26,8 +27,16 @@ set PWD=
 set UID=
 set SCRIPT=
 
-set ORACLE_HOME=c:\Oracle\11gRclient64
+
+:: get rid of any current setting
+set ORACLE_HOME=
+
+:: locate a 64 bit directory for Oracle
+for /d %%A in ("C:\Oracle\*64*") do set ORACLE_HOME=%%A
+
+:: Now check and make sure a 64 bit Oracle home directory was found
 if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr
+
 set BIN=c:\Oracle\11gR202Client64bit\bin
 if not EXIST %BIN%\NUL goto oraBinErr
 set TNS_ADMIN=%ORACLE_HOME%\network\admin
