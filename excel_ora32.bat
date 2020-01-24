@@ -16,7 +16,7 @@ for %%i in (%EXCEL%) do set EXCEL_SHORT_NAME=%%~si
 
 Rem Need to use the 11gR202Client32bit client for the
 Rem correct OLE DB Provider for Oracle
-set ORACLE_HOME=C:\Oracle\11gR202Client32bit
+set ORACLE_HOME=C:\Oracle\11gR2Client32
 @echo starting EXCEL using 32 bit software from %ORACLE_HOME%
 Rem use the ping command to force a 5 second delay
 ping 127.0.0.1 -n 6 > nul

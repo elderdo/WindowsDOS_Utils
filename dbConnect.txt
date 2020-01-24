@@ -12,8 +12,9 @@
 ;
 ; UID=RMADADMN_USER
 ; HOST_NAME=tnsname
-; PWD=password_for_RMADADMN_USER
-; CTL_FILE=control_file_for_sqlldr
+; PWD=xxxxxxxxxxxx
+; CTL_FILE=load_rmad_availability.ctl
+; DATA_FILE=path_to_flat_file_used_by_the_CTL_FILE
 ; SCRIPT=script_for_sqlplus
 ;
 ; Provie the directory
@@ -29,6 +30,8 @@
 ; Only put PWD= when this file is on your PC and
 ; in your Documents folder
 
-UID=an_ORACLE_ID
-HOST_STRING=a_TNSNAME
-PWD=password_for_an_ORACLE_ID
+UID=RMADADMN_USER
+HOST_NAME=RMADP
+PWD=rmadadmnPhx77
+CTL_FILE=load_rmad_availability.ctl
+DATA_FILE=C:\Users\zf297a\Dcouments\RMADS\data\availability.txt

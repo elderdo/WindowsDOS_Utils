@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>~\Documents\dos\execSqlplus.bat.html</title>
+<meta name="Generator" content="Vim/8.0">
+<meta name="plugin-version" content="vim7.4_v2">
+<meta name="syntax" content="dosbatch">
+<meta name="settings" content="use_css,pre_wrap,no_foldcolumn,expand_tabs,prevent_copy=">
+<meta name="colorscheme" content="elflord">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #00ffff; background-color: #000000; }
+body { font-family: monospace; color: #00ffff; background-color: #000000; }
+* { font-size: 1em; }
+.Special { color: #ff0000; }
+.Identifier { color: #40ffff; }
+.Statement { color: #aa4444; font-weight: bold; }
+.Comment { color: #80a0ff; }
+.Constant { color: #ff00ff; }
+.Function { color: #ffffff; }
+.Repeat { color: #ffffff; }
+.Operator { color: #ff0000; }
+-->
+</style>
+
+<script type='text/javascript'>
+<!--
+
+-->
+</script>
+</head>
+<body>
+<pre id='vimCodeElement'>
+@<span class="Function">echo</span><span class="Operator"> off</span>
+<span class="Comment">:: vim&#0058; ts=</span><span class="Constant">2</span><span class="Comment">:sw=</span><span class="Constant">2</span><span class="Comment">:sts=</span><span class="Constant">2</span><span class="Comment">:et:syntax=dosbatch</span>
+<span class="Comment">:: execSqlplus.bat</span>
+<span class="Comment">:: Author: Douglas S. Elder</span>
+<span class="Comment">:: Date: </span><span class="Constant">10</span><span class="Comment">/</span><span class="Constant">16</span><span class="Comment">/</span><span class="Constant">2014</span>
+<span class="Comment">:: Desc: Run sqlplus </span>
+<span class="Comment">:: scripts </span>
+<span class="Comment">:: An optional command line argument</span>
+<span class="Comment">:: specifying what script to be executed</span>
+<span class="Comment">:: can be used</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.0 </span><span class="Constant">10</span><span class="Comment">/</span><span class="Constant">16</span><span class="Comment">/</span><span class="Constant">2014</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.1 </span><span class="Constant">12</span><span class="Comment">/</span><span class="Constant">12</span><span class="Comment">/</span><span class="Constant">2017</span><span class="Comment"> added command line args -o -p and -d</span>
+<span class="Comment">::                    used OPT_FILE for env var override file</span>
+<span class="Comment">::                    used UID, HOST_STRING, PWD and SCRIPT</span>
+<span class="Comment">::                    env var's to run sqlplus</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.2 </span><span class="Constant">04</span><span class="Comment">/</span><span class="Constant">09</span><span class="Comment">/</span><span class="Constant">2818</span><span class="Comment"> Changed ORACLE_HOME to C:\Oracle\11gRclient64</span>
+
+<span class="Function">setlocal</span> enableextensions enabledelayedexpansion
+
+<span class="Comment">:: Tell sqlplus it can find</span>
+<span class="Comment">:: scripts in the current directory</span>
+<span class="Comment">:: this may be overridden</span>
+<span class="Comment">:: in the dbConnect.txt file</span>
+<span class="Function">set</span><span class="Identifier"> ORACLE_PATH</span><span class="Operator">=</span><span class="Identifier">%CD%</span>
+<span class="Function">set</span><span class="Identifier"> PWD</span><span class="Operator">=</span>
+<span class="Function">set</span><span class="Identifier"> UID</span><span class="Operator">=</span>
+<span class="Function">set</span><span class="Identifier"> SCRIPT</span><span class="Operator">=</span>
+
+<span class="Function">set</span><span class="Identifier"> ORACLE_HOME</span><span class="Operator">=</span>c:\Oracle\11gR202Client64bit
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Identifier">%ORACLE_HOME%</span>\NUL <span class="Statement">goto</span><span class="Statement"> oraHomeErr</span>
+<span class="Function">set</span><span class="Identifier"> BIN</span><span class="Operator">=</span>c:\Oracle\11gR202Client64bit\bin
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Identifier">%BIN%</span>\NUL <span class="Statement">goto</span><span class="Statement"> oraBinErr</span>
+<span class="Function">set</span><span class="Identifier"> TNS_ADMIN</span><span class="Operator">=</span><span class="Identifier">%ORACLE_HOME%</span>\network\admin
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Identifier">%TNS_ADMIN%</span>\NUL <span class="Statement">goto</span><span class="Statement"> oraTnsErr</span>
+<span class="Function">set</span><span class="Identifier"> PATH</span><span class="Operator">=</span><span class="Identifier">%BIN%</span>\bin;<span class="Identifier">%PATH%</span>
+
+<span class="Comment">:: set default connection</span>
+<span class="Function">set</span><span class="Identifier"> HOST_STRING</span><span class="Operator">=</span>RMADP
+<span class="Function">set</span><span class="Identifier"> UID</span><span class="Operator">=</span><span class="Identifier">%USERNAME%</span>
+<span class="Function">set</span><span class="Identifier"> OPT_FILE</span><span class="Operator">=</span>dbConnect.txt
+
+<span class="Statement">:loop</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-o&quot;</span> <span class="Statement">goto</span><span class="Statement"> setOptFile</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-p&quot;</span> <span class="Statement">goto</span><span class="Statement"> setPasswd</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-d&quot;</span> <span class="Statement">goto</span><span class="Statement"> setDebug</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">:~</span><span class="Constant">0</span><span class="Constant">,</span><span class="Constant">1</span><span class="Constant">%&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-&quot;</span> <span class="Statement">goto</span><span class="Statement"> invalidSwitch</span>
+
+<span class="Comment">:: if there is a positional command line argument</span>
+<span class="Comment">:: use that for the script to execute</span>
+<span class="Repeat">if</span><span class="Operator"> not </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> (
+  <span class="Function">set</span><span class="Identifier"> SCRIPT</span><span class="Operator">=</span><span class="Identifier">%1</span>
+)
+
+
+<span class="Repeat">if</span><span class="Operator"> EXIST</span> <span class="Identifier">%OPT_FILE%</span> (
+<span class="Repeat">for</span> <span class="Special">/f</span> <span class="Constant">&quot;eol=;&quot;</span> <span class="Special">%%</span>A in (<span class="Identifier">%OPT_FILE%</span>) do (
+    <span class="Function">set</span> <span class="Special">%%</span>A
+  )
+)
+
+
+<span class="Comment">:: if there is a script to </span>
+<span class="Comment">:: execute, make sure it exists</span>
+<span class="Comment">:: and add the @ at the beginning </span>
+<span class="Comment">:: of the file name</span>
+<span class="Repeat">if</span><span class="Operator"> not </span><span class="Constant">&quot;</span><span class="Identifier">%SCRIPT%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> (
+
+  <span class="Repeat">if</span><span class="Operator"> EXIST</span> <span class="Constant">&quot;</span><span class="Identifier">%SCRIPT%</span><span class="Constant">&quot;</span> (
+    <span class="Function">set</span><span class="Identifier"> SCRIPT</span><span class="Operator">=</span>@<span class="Identifier">%SCRIPT%</span>
+  ) <span class="Repeat">else</span> (
+    <span class="Repeat">if</span><span class="Operator"> EXIST</span> <span class="Constant">&quot;</span><span class="Identifier">%ORACLE_PATH%</span><span class="Constant">\</span><span class="Identifier">%SCRIPT%</span><span class="Constant">&quot;</span> (
+       <span class="Function">set</span><span class="Identifier"> SCRIPT</span><span class="Operator">=</span>@<span class="Identifier">%SCRIPT%</span>
+    ) <span class="Repeat">else</span> (
+      <span class="Statement">goto</span><span class="Statement"> oraScriptErr</span>
+    )
+  )
+
+)
+
+<span class="Function">set</span><span class="Identifier"> RC</span><span class="Operator">=</span>
+<span class="Function">set</span><span class="Identifier"> OPT</span><span class="Operator">=</span>
+<span class="Comment">:: if there is a password assume this is a pure</span>
+<span class="Comment">:: batch execution. Allow only one login attempt</span>
+<span class="Comment">:: and suppress all SQL*Plus informat and prompt messages</span>
+<span class="Repeat">if</span><span class="Operator"> not </span><span class="Constant">&quot;</span><span class="Identifier">%PWD%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Function">set</span><span class="Identifier"> OPT</span><span class="Operator">=</span><span class="Constant">&quot;-LOGON -SILENT&quot;</span>
+<span class="Function">set</span><span class="Identifier"> OPT</span><span class="Operator">=</span><span class="Identifier">%OPT:&quot;=%</span>
+<span class="Identifier">%BIN%</span>\sqlplus <span class="Identifier">%OPT%</span> <span class="Identifier">%UID%</span>@<span class="Identifier">%HOST_STRING%</span>/<span class="Identifier">%PWD%</span> <span class="Identifier">%SCRIPT%</span>
+<span class="Function">set</span><span class="Identifier"> RC</span><span class="Operator">=</span><span class="Identifier">%ERRORLEVEL%</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%RC%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;0&quot;</span> (
+  @<span class="Function">echo</span><span class="Constant">.sqlplus has successfully executed</span>
+) <span class="Repeat">else</span> (
+  @<span class="Function">echo</span><span class="Constant">.sqlplus did not run successfully</span>
+)
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:setDebug</span>
+<span class="Function">shift</span>
+@<span class="Function">echo</span><span class="Operator"> on</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:setScript</span>
+<span class="Function">shift</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> Usage</span>
+<span class="Function">set</span><span class="Identifier"> SCRIPT</span><span class="Operator">=</span><span class="Identifier">%1</span>
+<span class="Function">shift</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:setPwd</span>
+<span class="Function">shift</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> Usage</span>
+<span class="Function">set</span><span class="Identifier"> PWD</span><span class="Operator">=</span><span class="Identifier">%1</span>
+<span class="Function">shift</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:setOptFile</span>
+<span class="Function">shift</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> Usage</span>
+<span class="Function">set</span><span class="Identifier"> OPT_FILE</span><span class="Operator">=</span><span class="Identifier">%1</span>
+<span class="Function">shift</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+
+
+<span class="Statement">:oraHomeErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find directory </span><span class="Identifier">%ORACLE_HOME%</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:oraBinErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find directory </span><span class="Identifier">%BIN%</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:oraTnsErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find directory </span><span class="Identifier">%TNS_ADMIN%</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:invalidSwitch</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;</span><span class="Identifier">%1</span><span class="Constant"> is an invalid switch&quot;</span>
+<span class="Statement">goto</span><span class="Statement">:Usage</span>
+
+<span class="Statement">:oraScriptErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find sqlplus script </span><span class="Identifier">%SCRIPT%</span>
+<span class="Statement">goto</span><span class="Statement">:Usage</span>
+
+<span class="Statement">:Usage</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;execSqlplus.bat [ -d -o opt_file -p pwd script ]</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;where -d turns on debug&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      -o opt_file contains env overrides&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      -p pwd is the Oracle password for the account being ussed&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      script is a positional param after the command line arg switches&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      it contains the SQL*Plus command and DML to execute.&quot;</span>
+
+
+<span class="Function">endlocal</span>
+
+<span class="Statement">:done</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%PWD%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Function">pause</span>
+</pre>
+</body>
+</html>
+<!-- vim: set foldmethod=manual : -->
