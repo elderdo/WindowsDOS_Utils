@@ -11,13 +11,24 @@
 :: Rev 1.1 add slash between HOST_STRING and PWD env variables
 :: Rev 1.2 Made ORACLE_HOME the same as the one used by
 ::         exeSqlplus.bat
+:: Rev 1.3 09/05/2018 changed ORACLE_HOME because of new install of the 
+::         Oracle client
+:: Rev 1.4 10/08/2019 automatically locate ORACLE_HOME
 
 setlocal enableextensions enabledelayedexpansion
 
-set ORACLE_HOME=C:\Oracle\11gR2client64
+:: get rid of any current setting
+set ORACLE_HOME=
+
+:: locate a 64 bit directory for Oracle
+for /d %%A in ("C:\Oracle\*64*") do set ORACLE_HOME=%%A
+
+:: Now check and make sure a 64 bit Oracle home directory was found
+if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr
+
 set PWD=
 set CTL_FILE=
-if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr
+
 
 set BIN=%ORACLE_HOME%\bin
 if not EXIST %BIN%\NUL goto oraBinErr
