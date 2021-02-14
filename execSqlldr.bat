@@ -18,10 +18,10 @@
 setlocal enableextensions enabledelayedexpansion
 
 :: get rid of any current setting
-set ORACLE_HOME=
+set ORACLE_HOME=C:\Oracle64\19cClient
 
 :: locate a 64 bit directory for Oracle
-for /d %%A in ("C:\Oracle\*64*") do set ORACLE_HOME=%%A
+::for /d %%A in ("C:\Oracle\*64*") do set ORACLE_HOME=%%A
 
 :: Now check and make sure a 64 bit Oracle home directory was found
 if not EXIST %ORACLE_HOME%\NUL goto oraHomeErr

@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>~\Documents\dos\execSqlldr.bat.html</title>
+<meta name="Generator" content="Vim/8.1">
+<meta name="plugin-version" content="vim7.4_v2">
+<meta name="syntax" content="dosbatch">
+<meta name="settings" content="use_css,pre_wrap,no_foldcolumn,expand_tabs,prevent_copy=">
+<meta name="colorscheme" content="elflord">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #00ffff; background-color: #000000; }
+body { font-family: monospace; color: #00ffff; background-color: #000000; }
+* { font-size: 1em; }
+.Function { color: #ffffff; }
+.Repeat { color: #ffffff; }
+.Statement { color: #aa4444; font-weight: bold; }
+.Comment { color: #80a0ff; }
+.Constant { color: #ff00ff; }
+.Special { color: #ff0000; }
+.Identifier { color: #40ffff; }
+.Operator { color: #ff0000; }
+-->
+</style>
+
+<script type='text/javascript'>
+<!--
+
+-->
+</script>
+</head>
+<body>
+<pre id='vimCodeElement'>
+@<span class="Function">echo</span><span class="Operator"> off</span>
+<span class="Comment">:: vim&#0058; ts=</span><span class="Constant">2</span><span class="Comment">:sw=</span><span class="Constant">2</span><span class="Comment">:sts=</span><span class="Constant">2</span><span class="Comment">:et:syntax=dosbatch</span>
+<span class="Comment">:: execSqlldr.bat</span>
+<span class="Comment">:: Author: Douglas S. Elder</span>
+<span class="Comment">:: Date: </span><span class="Constant">11</span><span class="Comment">/</span><span class="Constant">18</span><span class="Comment">/</span><span class="Constant">2014</span>
+<span class="Comment">:: Desc: Run sqlldr </span>
+<span class="Comment">:: scripts </span>
+<span class="Comment">:: An optional command line argument</span>
+<span class="Comment">:: specifying what opt file to use</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.0 </span><span class="Constant">11</span><span class="Comment">/</span><span class="Constant">10</span><span class="Comment">/</span><span class="Constant">2014</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.1 add slash between HOST_STRING and PWD env variables</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.2 Made ORACLE_HOME the same as the one used by</span>
+<span class="Comment">::         exeSqlplus.bat</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.3 </span><span class="Constant">09</span><span class="Comment">/</span><span class="Constant">05</span><span class="Comment">/</span><span class="Constant">2018</span><span class="Comment"> changed ORACLE_HOME because of new install of the </span>
+<span class="Comment">::         Oracle client</span>
+<span class="Comment">:: Rev </span><span class="Constant">1</span><span class="Comment">.4 </span><span class="Constant">10</span><span class="Comment">/</span><span class="Constant">08</span><span class="Comment">/</span><span class="Constant">2019</span><span class="Comment"> automatically locate ORACLE_HOME</span>
+
+<span class="Function">setlocal</span> enableextensions enabledelayedexpansion
+
+<span class="Comment">:: get rid of any current setting</span>
+<span class="Function">set</span><span class="Identifier"> ORACLE_HOME</span><span class="Operator">=</span>
+
+<span class="Comment">:: locate a </span><span class="Constant">64</span><span class="Comment"> bit directory for Oracle</span>
+<span class="Repeat">for</span> <span class="Special">/d</span> <span class="Special">%%</span>A in (<span class="Constant">&quot;C:\Oracle\*64*&quot;</span>) do <span class="Function">set</span><span class="Identifier"> ORACLE_HOME</span><span class="Operator">=</span><span class="Special">%%</span>A
+
+<span class="Comment">:: Now check and make sure a </span><span class="Constant">64</span><span class="Comment"> bit Oracle home directory was found</span>
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Identifier">%ORACLE_HOME%</span>\NUL <span class="Statement">goto</span><span class="Statement"> oraHomeErr</span>
+
+<span class="Function">set</span><span class="Identifier"> PWD</span><span class="Operator">=</span>
+<span class="Function">set</span><span class="Identifier"> CTL_FILE</span><span class="Operator">=</span>
+
+
+<span class="Function">set</span><span class="Identifier"> BIN</span><span class="Operator">=</span><span class="Identifier">%ORACLE_HOME%</span>\bin
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Identifier">%BIN%</span>\NUL <span class="Statement">goto</span><span class="Statement"> oraBinErr</span>
+
+<span class="Function">set</span><span class="Identifier"> TNS_ADMIN</span><span class="Operator">=</span><span class="Identifier">%ORACLE_HOME%</span>\network\admin
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Identifier">%TNS_ADMIN%</span>\NUL <span class="Statement">goto</span><span class="Statement"> oraTnsErr</span>
+
+<span class="Function">set</span><span class="Identifier"> PATH</span><span class="Operator">=</span><span class="Identifier">%BIN%</span>\bin;<span class="Identifier">%PATH%</span>
+
+<span class="Comment">:: set default connection</span>
+<span class="Function">set</span><span class="Identifier"> HOST_STRING</span><span class="Operator">=</span>AMDD
+<span class="Function">set</span><span class="Identifier"> UID</span><span class="Operator">=</span><span class="Identifier">%USERNAME%</span>
+
+<span class="Function">set</span><span class="Identifier"> OPT_FILE</span><span class="Operator">=</span>dbConnect.txt
+
+<span class="Statement">:loop</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-o&quot;</span> <span class="Statement">goto</span><span class="Statement"> setOptFile</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-p&quot;</span> <span class="Statement">goto</span><span class="Statement"> setPasswd</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-d&quot;</span> <span class="Statement">goto</span><span class="Statement"> setDebug</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;-c&quot;</span> <span class="Statement">goto</span><span class="Statement"> setCtl</span>
+
+<span class="Repeat">if</span><span class="Operator"> EXIST</span> <span class="Constant">&quot;</span><span class="Identifier">%OPT_FILE%</span><span class="Constant">&quot;</span> (
+<span class="Repeat">for</span> <span class="Special">/f</span> <span class="Constant">&quot;eol=;&quot;</span> <span class="Special">%%</span>A in (<span class="Identifier">%OPT_FILE%</span>) do (
+    <span class="Function">set</span> <span class="Special">%%</span>A
+  )
+)
+
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%CTL_FILE%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> MissingCtl</span>
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Constant">&quot;</span><span class="Identifier">%CTL_FILE%</span><span class="Constant">&quot;</span> <span class="Statement">goto</span><span class="Statement"> badCtl</span>
+<span class="Repeat">if</span><span class="Operator"> not EXIST</span> <span class="Constant">&quot;</span><span class="Identifier">%DATA_FILE%</span><span class="Constant">&quot;</span> <span class="Statement">goto</span><span class="Statement"> badData</span>
+
+<span class="Function">set</span><span class="Identifier"> RC</span><span class="Operator">=</span>
+<span class="Identifier">%BIN%</span>\sqlldr <span class="Identifier">%UID%</span>@<span class="Identifier">%HOST_STRING%</span>/<span class="Identifier">%PWD%</span><span class="Identifier"> control</span><span class="Operator">=</span><span class="Identifier">%CTL_FILE%</span><span class="Identifier"> data</span><span class="Operator">=</span><span class="Identifier">%DATA_FILE%</span> ^
+       <span class="Identifier"> rows</span><span class="Operator">=</span><span class="Constant">10000</span><span class="Identifier"> readsize</span><span class="Operator">=</span><span class="Constant">10000000</span><span class="Identifier"> bindsize</span><span class="Operator">=</span><span class="Constant">10000000</span> ^
+       <span class="Identifier"> log</span><span class="Operator">=</span><span class="Identifier">%APPNAME%</span>.log ^
+       <span class="Identifier"> bad</span><span class="Operator">=</span><span class="Identifier">%APPNAME%</span>.bad
+
+<span class="Function">set</span><span class="Identifier"> RC</span><span class="Operator">=</span><span class="Identifier">%ERRORLEVEL%</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%RC%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;0&quot;</span> @<span class="Function">echo</span><span class="Constant">.sqlldr has successfully executed</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%RC%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;2&quot;</span> @<span class="Function">echo</span><span class="Constant">.sqlldr has executed with a warning</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%RC%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;3&quot;</span> @<span class="Function">echo</span><span class="Constant">.sqlldr has failed</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%RC%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;4&quot;</span> @<span class="Function">echo</span><span class="Constant">.sqlldr has had a fatal error</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:setDebug</span>
+<span class="Function">shift</span>
+@<span class="Function">echo</span><span class="Operator"> on</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:setPwd</span>
+<span class="Function">shift</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> Usage</span>
+<span class="Function">set</span><span class="Identifier"> PWD</span><span class="Operator">=</span>/<span class="Identifier">%1</span>
+<span class="Function">shift</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:setOptFile</span>
+<span class="Function">shift</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> Usage</span>
+<span class="Function">set</span><span class="Identifier"> OPT_FILE</span><span class="Operator">=</span><span class="Identifier">%1</span>
+<span class="Function">shift</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:setCtl</span>
+<span class="Function">shift</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%1</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Statement">goto</span><span class="Statement"> Usage</span>
+<span class="Function">set</span><span class="Identifier"> CTL_FILE</span><span class="Operator">=</span><span class="Identifier">%1</span>
+<span class="Function">shift</span>
+<span class="Statement">goto</span><span class="Statement"> loop</span>
+
+<span class="Statement">:badData</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant"> </span><span class="Identifier">%DATA_FILE%</span><span class="Constant"> does not exist</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:badCtl</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant"> </span><span class="Identifier">%CTL_FILE%</span><span class="Constant"> does not exist</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:oraHomeErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find directory </span><span class="Identifier">%ORACLE_HOME%</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:oraBinErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find directory </span><span class="Identifier">%BIN%</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:MissingCtl</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;You must supply a ctl file for SQL*Loader to run&quot;</span>
+<span class="Statement">goto</span><span class="Statement">:Usage</span>
+
+<span class="Statement">:oraTnsErr</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.Cannot find directory </span><span class="Identifier">%TNS_ADMIN%</span>
+<span class="Statement">goto</span><span class="Statement">:done</span>
+
+<span class="Statement">:Usage</span>
+@<span class="Function">echo</span><span class="Constant">.</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;execSqlldr.bat [ -c ctl_file -d -o opt_file -p pwd ]</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;where -c ctl_file is the control file for SQL*Loader to run&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      -d turns on debug&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      -o opt_file contains env overrides&quot;</span>
+@<span class="Function">echo</span><span class="Constant">.&quot;      -p pwd is the Oracle password for the account being ussed&quot;</span>
+
+
+<span class="Function">endlocal</span>
+
+<span class="Statement">:done</span>
+<span class="Repeat">if</span><span class="Operator"> </span><span class="Constant">&quot;</span><span class="Identifier">%PWD%</span><span class="Constant">&quot;</span><span class="Operator">==</span><span class="Constant">&quot;&quot;</span> <span class="Function">pause</span>
+</pre>
+</body>
+</html>
+<!-- vim: set foldmethod=manual : -->

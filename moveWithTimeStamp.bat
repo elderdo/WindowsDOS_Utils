@@ -8,19 +8,37 @@
 ::
 ::
 @echo off
+:loop
+if "%1"=="-d" goto setDebug
 if "%1"=="" goto missingSource
 if not exist %1 goto sourceNotExist
 if "%2"=="" goto missingDest
 if not exist %2\NUL goto destNotExist
 
 setlocal ENABLEDELAYEDEXPANSION 
-For /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set mydate=%%c_%%a_%%b)
-For /f "tokens=1-2 delims=/:" %%a in ("%TIME%") do (set mytime=%%a_%%b)
+:: get the date and time and then into single variable
+for /F "tokens=2-4 delims=/ " %%i in ('date /t') do set tdtd=%%k_%%i_%%j
+for /F "tokens=1-4 delims=/ " %%i in ('date /t') do @echo i=%%i j=%%j k=%%k l=%%l m=%%m
+@echo tdtd=%tdtd%
+set PATH=C:\Windows\System32;%PATH%
+for /F "tokens=5-8 delims=:. " %%i in ('echo.^| time ^| find "current" ') do set ttrn=%%i_%%j_%%k_%%l
+for /F "tokens=5-8 delims=:. " %%i in ('echo.^| time ^| find "current" ') do @echo i=%%i j=%%j k=%%k
+set ttrn=0%ttrn%
+echo ttrn=%ttrn%
+set ttrn=%ttrn:~-11%
+echo ttrn=%ttrn%
+set timestamp=%tdtd%_%ttrn%
+
 set source=%1
 set dest=%2
 if %~z1 == 0 goto emptyFile
-move %source% %dest%\%mydate%_%mytime%_%source%
+move %source% %dest%\%timestamp%_%source%
 goto done
+
+:setDebug
+shift
+@echo on
+goto loop
 
 :emptyFile
 @echo %1 is empty - deleted

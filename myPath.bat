@@ -1,5 +1,8 @@
-@echo off
+@echo on
+setlocal enabledelayedexpansion
 del %TEMP%\myPath.txt
 for %%a in ("%PATH:;=";"%") do @echo %%~a >> %TEMP%\myPath.txt
-if exist C:\PROGRA~2\Vim\vim74\gvim.exe start C:\PROGRA~2\Vim\vim74\gvim.exe %TEMP%\myPath.txt
-if not exist C:\PROGRA~2\Vim\vim74\gvim.exe start notepad %TEMP%\myPath.txt
+for /F "usebackq delims=" %%A in (`where gvim.exe`) do SET GVIM="%%A"
+if not %GVIM%=="" start %GVIM% -R %TEMP%\myPath.txt
+if %GVIM%=="" start notepad %TEMP%\myPath.txt
+endlocal 

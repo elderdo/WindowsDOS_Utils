@@ -15,10 +15,11 @@ if "%1"=="-d" goto setDebug
 if "%1"=="-h" goto Usage
 if "%1"=="-p" goto setPattern
 if "%1"=="-n" goto setCount
+if not "%1"=="" goto Usage
 if "%PATTERN%"=="" SET PATTERN=llLLccCCvvVVnl
 if "%CNT%"== "" SET CNT=1
 for /F "tokens=* USEBACKQ" %%F in (`%PWDGEN% %PATTERN% %CNT%`) DO (
-  SET var="%%F"
+  SET var=%%F
   echo !var!
   echo !var! | clip
 )

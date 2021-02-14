@@ -20,7 +20,11 @@ for /F "tokens=1-4 delims=/ " %%i in ('date /t') do @echo i=%%i j=%%j k=%%k l=%%
 set PATH=C:\Windows\System32;%PATH%
 for /F "tokens=5-8 delims=:. " %%i in ('echo.^| time ^| find "current" ') do set ttrn=%%i_%%j_%%k_%%l
 for /F "tokens=5-8 delims=:. " %%i in ('echo.^| time ^| find "current" ') do @echo i=%%i j=%%j k=%%k
-set tufn=%tdtd%_%ttrn%.txt
+set ttrn=0%ttrn%
+echo ttrn=%ttrn%
+set ttrn=%ttrn:~-11%
+echo ttrn=%ttrn%
+set timestamp=%tdtd%_%ttrn%
  
 :: now create the file
 @echo %tufn%

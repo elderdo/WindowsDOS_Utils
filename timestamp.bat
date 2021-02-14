@@ -13,6 +13,8 @@ for /f "tokens=1-7 delims=:/-, " %%i in ('echo exit^|cmd /q /k"prompt $d $t"') d
       set ss=%%o
    )
 )
+set hh=0%hh%
+set hh=%hh:~-2%
 @echo %yy%_%mm%_%dd%_%hh%_%min%_%ss%
 mkdir %yy%_%mm%_%dd%
 set ENV=AMDD
