@@ -32,6 +32,6 @@
 
 UID=RMADADMN_USER
 HOST_NAME=RMADP
-PWD=rmadadmnPhx77
+PWD=xxxxxxxxxxxxxxxxxxxxxx
 CTL_FILE=load_rmad_availability.ctl
 DATA_FILE=C:\Users\zf297a\Dcouments\RMADS\data\availability.txt
